@@ -9,10 +9,9 @@
  */
 #include "db.h"
 
-int db_open(const char *path)
-{
-    (void)path;
+int db_open(const char *path) {
+  (void)path;
 
-    /* TODO sqlite3_open, then apply schema.sql if we just created it */
-    return -1;
+  /* TODO sqlite3_open, then apply schema.sql if we just created it */
+  return -1;
 }
