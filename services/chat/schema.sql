@@ -1,0 +1,13 @@
+-- tables for the chat service. db_open() applies this when the database
+-- file doesn't exist yet.
+--
+-- rough plan:
+--   users     id, name, created_at   (names come off the auth tickets)
+--   rooms     id, name, topic
+--   members   room_id, user_id       (who's currently in what)
+--   messages  id, room_id, user_id, body, sent_at
+--
+-- messages is the only one that really needs to grow - might want an
+-- index on (room_id, sent_at) once we're replaying history on join.
+
+-- TODO write these out
