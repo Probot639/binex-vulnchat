@@ -11,13 +11,11 @@
 # arch hardens by default so none of this is safe to leave implicit.
 # `make check` asserts the binary actually came out the way we said.
 
-CC    := gcc
-BIN   := chatd
+CC := gcc
+BIN := chatd
 BUILD := build
 
-CFLAGS  := -std=c11 -Wall -Wextra -O0 -g \
-           -fno-stack-protector -fno-pie -U_FORTIFY_SOURCE \
-           -Iinclude
+CFLAGS := -std=c11 -Wall -Wextra -O0 -g -fno-stack-protector -fno-pie -U_FORTIFY_SOURCE -Iinclude
 LDFLAGS := -no-pie -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,lazy
 LDLIBS  :=
 # LDLIBS += -lsqlite3    # uncomment once db.c actually does something
