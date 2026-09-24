@@ -1,0 +1,8 @@
+{
+  "principal": "krbtgt/EXAMPLE.COM@EXAMPLE.COM",
+  "kvno": 1,
+  "enctype": "aes256-cts-hmac-sha384-192",
+  "timestamp": "2026-09-24T16:00:40Z",
+  "key_iv_hex": "4d8c2837e56f2de5039662529409ae8e",
+  "key_ciphertext_b64": "Fkq7TyG9YkHF5cRk2GmjrhnE8IeZXU/Vb4tjXnMF30pF0wJGtOXh8CkvRliyL2pOZqnBFCJRDLB9p4KrbQBKuR7ifi7epyzpjvnpEEYFEjU="
+}
