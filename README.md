@@ -7,6 +7,20 @@ Our service will be made up of a chat service and an authentication service. We�
 Client (Attacker) → Authentication Server (SAML or Kerberos) (Linux) (vulnerable 1) → User Authenticated Based Chat Room (Windows Client & Linux Client) (vulnerable 2)
 
 ## Implementation
+### Services
+| Service | Assignee |
+| :--- | --- |
+| Auth server | Gavin |
+| Linux client | Odessa |
+| Linux server | Odessa |
+| Windows client | Darwin |
+| Windows server | Darwin |
+
+### Architecture
+The chat server forks a child process for each connection. The parent does nothing but accept the connection and fork. Each child runs a frame loop- read a 4-byte length prefix (network byte order), then read that many bytes of payload. If the payload starts with `/`, it goes to the command handler. Otherwise, it gets handled as a normal chat message.
+
+### Build
+The chat server is written in C++ with the vulnerable parts (the command handler and message allocator) written in C. It's compiled using `-fno-stack-protector` for no canaries, `-no-pie` so there are fixed addresses, `-z noexecstack` to apply NX, `-z relro -z lazy` for partial RELRO and so `.got.plt` stays writable, and `-O0` for no inlining, as we need separate stack frames. `make check` validates this with `readelf`.
 
 ## Vulnerabilities
 
