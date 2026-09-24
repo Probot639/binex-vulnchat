@@ -40,7 +40,7 @@ void session_serve(int fd)
 
     char nick[CHAT_USER_MAX];
     memset(nick, 0, sizeof(nick));
-    if (readn(fd, &len, sizeof(len)) < 0){
+    if (readn(fd, nick, sizeof(len)) < 0){
         return;
     }
 
@@ -74,8 +74,5 @@ void session_serve(int fd)
 
 
         /* TODO: wrap in chat_msg and send to room */
-    }
-
-
     }
 }
