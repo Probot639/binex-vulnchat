@@ -17,13 +17,24 @@ struct chat_msg {
     char author[CHAT_USER_MAX];
 };
 
-struct chat_room;   /* defined in room.c */
+struct chat_room;   /* defined in room.cpp */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* vuln path (C) */
+int cmd_dispatch(struct chat_msg *m, const char *line, uint32_t len);
+struct chat_msg *msg_new(const char *author);
+
+/* scaffolding (C++) */
 int net_listen(uint16_t port);
 int net_accept(int srv);
 void session_serve(int fd);
 int room_broadcast(struct chat_room *r, const struct chat_msg *m);
-int cmd_dispatch(struct chat_msg *m, const char *line, uint32_t len);
-struct chat_msg *msg_new(const char *author);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

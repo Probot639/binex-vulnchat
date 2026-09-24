@@ -11,27 +11,40 @@
 # arch enables PIE+canary by default, none of this is safe to leave implicit.
 # `make check` asserts the binary actually came out the way we said.
 
-CC := gcc
+CC  := gcc
+CXX := g++
 BIN := chatd
 BUILD := build
 
-CFLAGS := -std=c11 -Wall -Wextra -O0 -g -fno-stack-protector -fno-pie -U_FORTIFY_SOURCE -Iinclude
-LDFLAGS := -no-pie -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,lazy
-LDLIBS  :=
+# shared between C and C++
+WARNINGS := -Wall -Wextra
+MITFLAGS := -O0 -g -fno-stack-protector -fno-pie -U_FORTIFY_SOURCE
+
+CFLAGS   := -std=c11 $(WARNINGS) $(MITFLAGS) -Iinclude
+CXXFLAGS := -std=c++17 $(WARNINGS) $(MITFLAGS) -Iinclude
+LDFLAGS  := -no-pie -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,lazy
+LDLIBS   :=
 # LDLIBS += -lsqlite3    # uncomment once db.c actually does something
 
-SRC := $(wildcard src/*.c)
-OBJ := $(patsubst src/%.c,$(BUILD)/%.o,$(SRC))
+# vuln code stays .c, scaffolding is .cpp
+CSRC   := $(wildcard src/*.c)
+CXXSRC := $(wildcard src/*.cpp)
+OBJ    := $(patsubst src/%.c,$(BUILD)/%.o,$(CSRC)) \
+          $(patsubst src/%.cpp,$(BUILD)/%.o,$(CXXSRC))
 
 .PHONY: all run check clean
 
 all: $(BUILD)/$(BIN)
 
+# link with g++ so the c++ runtime comes in
 $(BUILD)/$(BIN): $(OBJ)
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 $(BUILD)/%.o: src/%.c | $(BUILD)
 	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(BUILD)/%.o: src/%.cpp | $(BUILD)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 $(BUILD):
 	mkdir -p $(BUILD)
