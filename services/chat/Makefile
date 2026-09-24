@@ -8,7 +8,7 @@
 #                           read-only and kills the whole approach
 #   -O0                     stops gcc inlining things we want frames for
 #
-# arch hardens by default so none of this is safe to leave implicit.
+# arch enables PIE+canary by default, none of this is safe to leave implicit.
 # `make check` asserts the binary actually came out the way we said.
 
 CC := gcc

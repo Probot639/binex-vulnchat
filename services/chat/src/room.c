@@ -1,8 +1,7 @@
-/* room.c - who's in which room, and getting messages out to them.
+/* room.c
  *
- * the room table lives in the parent process, so each forked child is
- * working off its own copy. anything that has to outlive a connection
- * needs to go through db.c instead.
+ * room table is per-process (fork), so anything that needs to survive
+ * a connection goes through db.c
  */
 #include "chatd.h"
 
@@ -16,7 +15,5 @@ int room_broadcast(struct chat_room *r, const struct chat_msg *m)
 {
     (void)r;
     (void)m;
-
-    /* walk members[] and push the frame to each, skipping dead fds */
     return 0;
 }
