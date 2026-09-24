@@ -39,5 +39,5 @@ int net_listen(uint16_t port)
 
 int net_accept(int srv)
 {
-    return accept(src, nullptr, nullptr);
+    return accept(srv, nullptr, nullptr);
 }
