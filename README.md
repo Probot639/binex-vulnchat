@@ -25,3 +25,4 @@ The chat server is written in C++ with the vulnerable parts (the command handler
 ## Vulnerabilities
 
 ## Setup
+The auth will use EdDSA
