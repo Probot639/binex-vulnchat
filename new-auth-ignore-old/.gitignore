@@ -1,7 +1,0 @@
-# build artifacts
-*.o
-/authd
-/keygen
-# secrets & local state (never commit)
-/keys/
-/users.tbl
