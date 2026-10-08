@@ -1,1 +1,3 @@
 services/auth/keys
+services/auth/build
+.vscode/
