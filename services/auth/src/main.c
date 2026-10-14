@@ -10,7 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Make sure that the db file exists
+// alter the directory argument to append "/auth.db" to it
 static void resolve_db_path(const char *arg, char *out, size_t cap)
 {
     struct stat st;
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         }
     }
 
-    // check db, make sure it exists
+    // append the db filename onto the db path given by the user
     char db[1024];
     resolve_db_path(darg, db, sizeof db);
 
