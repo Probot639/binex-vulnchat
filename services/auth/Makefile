@@ -12,11 +12,12 @@ CC  := gcc
 CXX := g++
 BUILD := build
 
+ARCH	 := -m32
 WARN     := -Wall -Wextra
 MIT      := -O0 -g -fno-stack-protector -fno-pie -U_FORTIFY_SOURCE
-CFLAGS   := -std=c11   $(WARN) $(MIT) -Iinclude $(shell pkg-config --cflags libsodium)
-CXXFLAGS := -std=c++17 $(WARN) $(MIT) -Iinclude $(shell pkg-config --cflags libsodium sqlite3)
-LDFLAGS  := -no-pie -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,lazy
+CFLAGS   := -std=c11   $(ARCH) $(WARN) $(MIT) -Iinclude $(shell pkg-config --cflags libsodium)
+CXXFLAGS := -std=c++17 $(ARCH) $(WARN) $(MIT) -Iinclude $(shell pkg-config --cflags libsodium sqlite3)
+LDFLAGS  := $(ARCH) -no-pie -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,lazy
 LDLIBS   := -lsqlite3 $(shell pkg-config --libs libsodium)
 
 # vuln + helpers stay .c; sqlite scaffolding is .cpp
