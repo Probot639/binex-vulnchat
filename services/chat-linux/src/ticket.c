@@ -31,7 +31,6 @@ int ticket_init(const char *pk_path)
     return 0;
 }
 
-/* ---- minimal base64url decode ---- */
 
 static int b64val(char c)
 {
@@ -72,7 +71,6 @@ static int b64url_decode(const char *in, size_t inlen,
     return 0;
 }
 
-/* ---- extract "sub" from decoded JSON payload ---- */
 
 static int extract_sub(const char *json, size_t len,
                        char *out, uint32_t cap)
@@ -91,7 +89,6 @@ static int extract_sub(const char *json, size_t len,
     return 0;
 }
 
-/* ---- extract "exp" from decoded JSON payload ---- */
 
 static long extract_exp(const char *json, size_t len)
 {

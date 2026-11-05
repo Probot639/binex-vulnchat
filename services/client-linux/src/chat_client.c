@@ -41,7 +41,6 @@ static char g_host[256];
 static uint16_t g_port;
 
 
-/* ---- wire protocol (same framing as the servers) ---- */
 
 static int recvn(int fd, void *buf, size_t n)
 {
@@ -91,7 +90,6 @@ static int recv_frame(int fd, char *buf, size_t cap)
 }
 
 
-/* ---- message buffer ---- */
 
 static void post(const char *nick, const char *body, int is_sys)
 {
@@ -152,7 +150,6 @@ static int nick_color(const char *nick)
 }
 
 
-/* ---- receiver thread ---- */
 
 static void *recv_thread(void *arg)
 {
@@ -180,7 +177,6 @@ static void *recv_thread(void *arg)
 }
 
 
-/* ---- TCP connect ---- */
 
 static int dial(const char *host, uint16_t port)
 {
@@ -207,7 +203,6 @@ static int dial(const char *host, uint16_t port)
 }
 
 
-/* ---- curses ---- */
 
 static void draw(const char *input, int cursor)
 {

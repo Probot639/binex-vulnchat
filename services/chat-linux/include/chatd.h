@@ -41,6 +41,7 @@ int net_accept(int srv);
 void session_serve(int fd);
 struct chat_room *room_create(const char *name);
 struct chat_room *room_join(const char *name, int fd);
+void room_leave(struct chat_room *r, int fd);
 int room_broadcast(struct chat_room *r, const struct chat_msg *m);
 
 #ifdef __cplusplus

@@ -7,10 +7,12 @@
  */
 #include "chatd.h"
 #include "db.h"
+#include "ticket.h"
 
 #include <winsock2.h>
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
 
 /* from room_win.cpp */
 extern "C" void room_init(void);
@@ -32,8 +34,27 @@ int main(int argc, char **argv)
     }
 
     uint16_t port = CHATD_DEFAULT_PORT;
-    if (argc > 1){
-        port = (uint16_t)atoi(argv[1]);
+    const char *pk_path = nullptr;
+
+    for (int i = 1; i < argc; i++) {
+        if (!strcmp(argv[i], "-k") && i + 1 < argc)
+            pk_path = argv[++i];
+        else if (!strcmp(argv[i], "-p") && i + 1 < argc)
+            port = (uint16_t)atoi(argv[++i]);
+        else
+            port = (uint16_t)atoi(argv[i]);
+    }
+
+    if (!pk_path) {
+        fprintf(stderr, "usage: chatd [-p port] -k <pubkey>\n");
+        WSACleanup();
+        return 1;
+    }
+
+    if (ticket_init(pk_path) != 0) {
+        fprintf(stderr, "failed to load public key: %s\n", pk_path);
+        WSACleanup();
+        return 1;
     }
 
     room_init();
@@ -44,7 +65,7 @@ int main(int argc, char **argv)
         WSACleanup();
         return 1;
     }
-    fprintf(stderr, "chatd listening on %d\n", port);
+    fprintf(stderr, "chatd listening on %d (jwt verify on)\n", port);
 
     for (;;) {
         int fd = net_accept(srv);

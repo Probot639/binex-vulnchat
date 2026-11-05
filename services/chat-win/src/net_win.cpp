@@ -8,6 +8,7 @@
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <climits>
 #include <cstring>
 
 extern "C" int net_listen(uint16_t port)
@@ -35,6 +36,10 @@ extern "C" int net_listen(uint16_t port)
         return -1;
     }
 
+    if (fd > (SOCKET)INT_MAX) {
+        closesocket(fd);
+        return -1;
+    }
     return (int)fd;
 }
 
@@ -43,5 +48,9 @@ extern "C" int net_accept(int srv)
     SOCKET c = accept((SOCKET)srv, nullptr, nullptr);
     if (c == INVALID_SOCKET)
         return -1;
+    if (c > (SOCKET)INT_MAX) {
+        closesocket(c);
+        return -1;
+    }
     return (int)c;
 }

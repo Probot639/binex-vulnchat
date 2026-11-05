@@ -65,20 +65,33 @@ extern "C" struct chat_room *room_join(const char *name, int fd)
     return r;
 }
 
+extern "C" void room_leave(struct chat_room *r, int fd)
+{
+    EnterCriticalSection(&rooms_cs);
+    for (int i = 0; i < r->nmembers; i++) {
+        if (r->members[i] == fd) {
+            r->members[i] = r->members[--r->nmembers];
+            break;
+        }
+    }
+    LeaveCriticalSection(&rooms_cs);
+}
+
 extern "C" int room_broadcast(struct chat_room *r, const struct chat_msg *m)
 {
     uint32_t net_len = htonl(m->len);
+    int fds[CHAT_ROOM_MAX];
+    int count;
 
     EnterCriticalSection(&rooms_cs);
+    count = r->nmembers;
+    memcpy(fds, r->members, count * sizeof(int));
+    LeaveCriticalSection(&rooms_cs);
 
-    for (int i = 0; i < r->nmembers; i++) {
-        SOCKET s = (SOCKET)r->members[i];
-
+    for (int i = 0; i < count; i++) {
+        SOCKET s = (SOCKET)fds[i];
         send(s, (const char *)&net_len, sizeof(net_len), 0);
-
         send(s, m->body, m->len, 0);
     }
-
-    LeaveCriticalSection(&rooms_cs);
     return 0;
 }

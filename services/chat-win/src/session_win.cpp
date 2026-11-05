@@ -3,9 +3,11 @@
  * join handshake first (ticket from auth), then loop on frames and
  * hand off to command.c or message.c. this owns the chat_msg.
  *
- * only difference from linux: recv() instead of read()
+ * only difference from linux: recv() instead of read(), threads
+ * instead of fork, no relay pipe (room_broadcast does direct sends).
  */
 #include "chatd.h"
+#include "ticket.h"
 
 #include <winsock2.h>
 #include <cstdio>
@@ -30,20 +32,28 @@ extern "C" void session_serve(int fd)
 {
     SOCKET s = (SOCKET)fd;
 
-    /* first frame is the nick for now, no auth yet */
+    /* first frame is the JWT from the auth server */
     uint32_t nlen;
-    if (recvn(s, &nlen, sizeof(nlen)) < 0){
+    if (recvn(s, &nlen, sizeof(nlen)) < 0)
         return;
-    }
     nlen = ntohl(nlen);
 
-    if (nlen == 0 || nlen >= CHAT_USER_MAX){
+    if (nlen == 0 || nlen > 1024)
         return;
-    }
+
+    char tok[1025];
+    if (recvn(s, tok, nlen) < 0)
+        return;
+    tok[nlen] = '\0';
 
     char nick[CHAT_USER_MAX];
     memset(nick, 0, sizeof(nick));
-    if (recvn(s, nick, nlen) < 0){
+
+    if (ticket_verify(tok, nlen, nick, CHAT_USER_MAX) != 0) {
+        const char *err = "ERR auth";
+        uint32_t el = htonl(8);
+        send(s, (const char *)&el, 4, 0);
+        send(s, err, 8, 0);
         return;
     }
 
@@ -86,10 +96,14 @@ extern "C" void session_serve(int fd)
 
         char line[4096];
         int n = snprintf(line, sizeof(line), "%s: %s", nick, buf);
+        if (n >= (int)sizeof(line))
+            n = (int)sizeof(line) - 1;
 
         struct chat_msg *m = msg_new(nick);
         msg_set_body(m, line, n);
         room_broadcast(room, m);
         msg_free(m);
     }
+
+    room_leave(room, fd);
 }

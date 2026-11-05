@@ -95,7 +95,9 @@ static auth_result_t txn(const char *host, uint16_t port,
 
     unsigned char hdr[4];
     if (recv_all(s, hdr, 4) != 0) { rc = AUTH_ERR_IO; goto done; }
-    uint32_t n = ntohl(*(uint32_t *)hdr);
+    uint32_t n;
+    memcpy(&n, hdr, 4);
+    n = ntohl(n);
     if (n == 0 || n > cap) { rc = AUTH_ERR_PROTO; goto done; }
     if (recv_all(s, reply, n) != 0) { rc = AUTH_ERR_IO; goto done; }
     *rlen = n;

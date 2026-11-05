@@ -25,7 +25,7 @@ MITFLAGS := -O0 -g -fno-stack-protector -fno-pie -U_FORTIFY_SOURCE
 CFLAGS   := -std=c11 $(WARNINGS) $(MITFLAGS) -Iinclude
 CXXFLAGS := -std=c++17 $(WARNINGS) $(MITFLAGS) -Iinclude
 LDFLAGS  := -Wl,--disable-dynamicbase -Wl,--nxcompat -Wl,--no-insert-timestamp
-LDLIBS   := -lws2_32
+LDLIBS   := -lws2_32 -lsodium
 # LDLIBS += -lsqlite3    # uncomment once db actually does something
 
 # vuln code stays .c (symlinked from chat-linux), scaffolding is .cpp

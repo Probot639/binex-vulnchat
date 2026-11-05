@@ -189,6 +189,8 @@ void session_serve(int fd)
 
         char line[4096];
         int n = snprintf(line, sizeof(line), "%s: %s", nick, buf);
+        if (n >= (int)sizeof(line))
+            n = (int)sizeof(line) - 1;
 
         struct chat_msg *m = msg_new(nick);
         msg_set_body(m, line, n);
