@@ -8,6 +8,12 @@
 #define CHAT_USER_MAX 64        /* has to match the auth ticket layout */
 #define CHAT_MSG_INLINE 128
 #define CHAT_ROOM_MAX 16
+#define WHO_TABLE_MAX 256
+
+struct who_slot {
+    int pid;
+    char nick[CHAT_USER_MAX];
+};
 
 struct chat_msg {
     uint32_t len;
@@ -26,11 +32,15 @@ extern "C" {
 /* vuln path (C) */
 int cmd_dispatch(struct chat_msg *m, const char *line, uint32_t len);
 struct chat_msg *msg_new(const char *author);
+void msg_free(struct chat_msg *m);
+void msg_set_body(struct chat_msg *m, const char *text, uint32_t len);
 
 /* scaffolding (C++) */
 int net_listen(uint16_t port);
 int net_accept(int srv);
 void session_serve(int fd);
+struct chat_room *room_create(const char *name);
+struct chat_room *room_join(const char *name, int fd);
 int room_broadcast(struct chat_room *r, const struct chat_msg *m);
 
 #ifdef __cplusplus

@@ -20,10 +20,10 @@ BUILD := build
 WARNINGS := -Wall -Wextra
 MITFLAGS := -O0 -g -fno-stack-protector -fno-pie -U_FORTIFY_SOURCE
 
-CFLAGS   := -std=c11 $(WARNINGS) $(MITFLAGS) -Iinclude
-CXXFLAGS := -std=c++17 $(WARNINGS) $(MITFLAGS) -Iinclude
+CFLAGS   := -std=c11 $(WARNINGS) $(MITFLAGS) -Iinclude $(shell pkg-config --cflags libsodium)
+CXXFLAGS := -std=c++17 $(WARNINGS) $(MITFLAGS) -Iinclude $(shell pkg-config --cflags libsodium)
 LDFLAGS  := -no-pie -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,lazy
-LDLIBS   :=
+LDLIBS   := $(shell pkg-config --libs libsodium)
 # LDLIBS += -lsqlite3    # uncomment once db.c actually does something
 
 # vuln code stays .c, scaffolding is .cpp

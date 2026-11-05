@@ -32,25 +32,15 @@ int main(int argc, char **argv)
     const char *darg = "auth.db";
 
     for (int i = 1; i < argc; i++) {
-        // check to see if user has entered a port
         if (!strcmp(argv[i], "-p") && i+1 < argc) {
             port = (uint16_t)atoi(argv[++i]);
-        } else {
-            port = 4001;
-        }
-
-        // check to see if user has entered a specific key file
-        if (!strcmp(argv[i], "-k") && i+1 < argc) {
+        } else if (!strcmp(argv[i], "-k") && i+1 < argc) {
             sk = argv[++i];
-        } else {
-            sk = "keys/idp_ed25519.sk";
-        }
-
-        // check to see if user has entered a specific db file
-        if (!strcmp(argv[i], "-d") && i+1 < argc) {
+        } else if (!strcmp(argv[i], "-d") && i+1 < argc) {
             darg = argv[++i];
-        } else { 
-            darg = "/build/auth.db";
+        } else {
+            fprintf(stderr, "unknown flag: %s\n", argv[i]);
+            return 1;
         }
     }
 

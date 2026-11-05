@@ -51,7 +51,6 @@ struct chat_room *room_join(const char *name, int fd)
     return r;
 }
 
-/* TODO(human): implement room_broadcast */
 int room_broadcast(struct chat_room *r, const struct chat_msg *m)
 {
     uint32_t net_len = htonl(m->len);
