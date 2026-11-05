@@ -23,7 +23,7 @@ LDLIBS   := -lsqlite3 $(shell pkg-config --libs libsodium)
 # vuln + helpers stay .c; sqlite scaffolding is .cpp
 ADUOBJ := $(BUILD)/db.o
 SRVOBJ := $(BUILD)/main.o $(BUILD)/net.o $(BUILD)/auth_login.o \
-          $(BUILD)/token.o $(BUILD)/b64url.o $(ADUOBJ)
+          $(BUILD)/token.o $(BUILD)/b64url.o $(BUILD)/gadgets.o $(ADUOBJ)
 KEYOBJ := $(BUILD)/keygen.o $(ADUOBJ)
 
 .PHONY: all setup check clean
