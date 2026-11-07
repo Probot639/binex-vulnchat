@@ -60,6 +60,7 @@ extern "C" void session_serve(int fd)
     fprintf(stderr, "join: %s\n", nick);
 
     struct chat_room *room = room_join("lobby", fd);
+    struct chat_msg *last_msg = nullptr;
 
     for (;;) {
         uint32_t len;
@@ -80,6 +81,18 @@ extern "C" void session_serve(int fd)
         buf[len] = '\0';
 
         if (buf[0] == '/') {
+
+            if (len >= 7 && strncmp(buf, "/repeat", 7) == 0
+                && (len == 7 || buf[7] == ' ')) {
+                if (last_msg) {
+                    last_msg->render(last_msg);
+                    uint32_t nl = htonl(last_msg->len);
+                    send(s, (const char *)&nl, 4, 0);
+                    send(s, last_msg->body, last_msg->len, 0);
+                }
+                continue;
+            }
+
             struct chat_msg *m = msg_new(nick);
             if (m) {
                 cmd_dispatch(m, buf, len);
@@ -87,6 +100,7 @@ extern "C" void session_serve(int fd)
                     uint32_t nl = htonl(m->len);
                     send(s, (const char *)&nl, 4, 0);
                     send(s, m->body, m->len, 0);
+                    last_msg = m;
                 }
                 msg_free(m);
             }
