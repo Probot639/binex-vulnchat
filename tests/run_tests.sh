@@ -22,24 +22,27 @@ case "${1:-all}" in
     exploits)
         python3 -m pytest test_exploits.py -v
         ;;
+    exploits-win)
+        python3 -m pytest test_exploits_win.py -v -p no:timeout
+        ;;
     win)
         if [ -n "$2" ]; then
             HOST="$2"; PORT="${3:-4002}"
-            python3 -m pytest test_chat_win.py -v --chat-host="$HOST" --chat-port="$PORT"
+            python3 -m pytest test_chat_win.py test_exploits_win.py -v -p no:timeout \
+                --chat-host="$HOST" --chat-port="$PORT"
         else
-            # try wine locally (fixture skips if chatd.exe or wine missing)
-            python3 -m pytest test_chat_win.py -v
+            python3 -m pytest test_chat_win.py test_exploits_win.py -v -p no:timeout
         fi
         ;;
     all-remote)
         HOST="${2:?need HOST}"; PORT="${3:-4002}"
-        python3 -m pytest -v --chat-host="$HOST" --chat-port="$PORT"
+        python3 -m pytest -v -p no:timeout --chat-host="$HOST" --chat-port="$PORT"
         ;;
     all)
-        python3 -m pytest -v
+        python3 -m pytest -v -p no:timeout
         ;;
     *)
-        echo "usage: $0 {all|auth|chat|exploits|win [HOST [PORT]]|all-remote HOST [PORT]}"
+        echo "usage: $0 {all|auth|chat|exploits|exploits-win|win [HOST [PORT]]|all-remote HOST [PORT]}"
         exit 1
         ;;
 esac

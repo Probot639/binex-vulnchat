@@ -63,7 +63,7 @@ def chat_jwt(auth_server):
 
 
 @pytest.fixture(scope="session")
-def wine_chat_server(request):
+def wine_chat_server(request, auth_server):
     host = request.config.getoption("--chat-host")
     port = request.config.getoption("--chat-port")
     if host and port:
@@ -71,8 +71,9 @@ def wine_chat_server(request):
         yield srv
         return
     srv = WineChatServer()
+    pk_path = getattr(auth_server, "pk_path", None)
     try:
-        srv.start()
+        srv.start(pk_path=pk_path)
     except (FileNotFoundError, RuntimeError) as e:
         pytest.skip(f"wine chat server not available: {e}")
     yield srv

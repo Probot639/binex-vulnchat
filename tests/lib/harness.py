@@ -87,6 +87,7 @@ class AuthServer:
                 raise FileNotFoundError(f"missing {p}, run `make setup` in services/auth")
 
         self.pk = open(pk_path, "rb").read()
+        self.pk_path = pk_path
         self.tmpdir = tempfile.mkdtemp(prefix="authtest_")
         dbpath = os.path.join(self.tmpdir, "auth_test.db")
 
@@ -194,7 +195,7 @@ class WineChatServer:
         here = os.path.dirname(os.path.abspath(__file__))
         return os.path.normpath(os.path.join(here, "..", "..", "services", "chat-win"))
 
-    def start(self):
+    def start(self, pk_path=None):
         chatd = os.path.join(self.base, "build", "chatd.exe")
         if not os.path.exists(chatd):
             raise FileNotFoundError(f"missing {chatd}, build the windows chat server first")
@@ -203,11 +204,18 @@ class WineChatServer:
         if not wine:
             raise RuntimeError("wine not installed")
 
+        if pk_path is None:
+            here = os.path.dirname(os.path.abspath(__file__))
+            pk_path = os.path.normpath(os.path.join(
+                here, "..", "..", "services", "auth", "keys", "idp_ed25519.pk"))
+        if not os.path.exists(pk_path):
+            raise FileNotFoundError(f"missing {pk_path}, run `make setup` in services/auth")
+
         self.port = free_port()
         env = os.environ.copy()
         env["WINEDEBUG"] = "-all"
         self.proc = subprocess.Popen(
-            [wine, chatd, str(self.port)],
+            [wine, chatd, "-p", str(self.port), "-k", pk_path],
             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             env=env)
 
