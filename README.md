@@ -24,5 +24,19 @@ The chat server is written in C++ with the vulnerable parts (the command handler
 
 ## Vulnerabilities
 
+### Buffer overflow (cmd_nick)
+
+The `/nick` command handler copies the argument into a 64-byte stack buffer via `memcpy` with no length check. On the Windows server (64-bit PE, no ASLR, no canary, DEP on), saved RIP sits at offset 72 from the buffer. The exploit writes a ROP chain that uses ucrtbase.dll gadgets (pop rax, pop rcx, mov [rcx] rax, ret) to assemble a command string in .bss byte by byte, then calls `system()`.
+
+There's a complication: after the memcpy, `cmd_nick` still calls `strncpy(m->author, tmp, 63)` where `m` is loaded from the shadow space at rbp+0x10 (payload offset 80). The chain has to put a writable address there or strncpy crashes before the epilogue runs. The fix uses a pop gadget at the return address that consumes the shadow space slot, with BSS_ADDR at offset 80 so strncpy writes harmlessly to .bss.
+
+![pwned.txt on target after overflow exploit](doc/overflow_pwned.png)
+
+### Use-after-free (last_msg / /repeat)
+
+The `/repeat` command dereferences `last_msg`, a pointer to a `chat_msg` struct that was already freed. The struct has a function pointer (`render`) at offset 144. Because the Windows server uses threads instead of fork, all clients share the process heap. A second client can spray `/me` messages with 215-byte bodies, and if the body allocation reuses the freed 216-byte chunk, the attacker controls the render pointer.
+
+On native Windows, the Low Fragmentation Heap randomizes bucket slot ordering, so the spray is probabilistic. The crash through the corrupted render pointer is reliable. Code execution needs LFH-tuned heap grooming.
+
 ## Setup
 The auth will use EdDSA
